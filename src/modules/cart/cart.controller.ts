@@ -35,7 +35,7 @@ const updateCart = asyncWrapper(async(req: AuthRequest, res: Response) => {
       const bookId = req.params.id as string
       const { quantity } = req.body
 
-    const cart = await cartService.updateCart(req.user.userId, bookId, req.body)
+    const cart = await cartService.updateCart(req.user.userId, bookId, quantity)
     return res.status(200).json({ msg: "Cart updated successfully", cart})
 });
 

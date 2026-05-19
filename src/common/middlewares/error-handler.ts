@@ -1,4 +1,5 @@
 import CustomAPIError from "../errors/custom-error";
+import ValidationError from "../errors/validation-error";
 import { Request, Response, NextFunction } from "express";
 
 const errorHandler = (
@@ -13,6 +14,7 @@ const errorHandler = (
     return res.status(err.statusCode).json({
       success: false,
       msg: err.message,
+      ...(err instanceof ValidationError && { errors: err.errors }),
     });
   }
 
