@@ -1,9 +1,7 @@
 import Book from "./book.model";
 import BadRequestError from "../../common/errors/bad-request";
 import NotFoundError from "../../common/errors/not_found";
-import { TokenUser } from "../../common/utils/jwt";
 import Review from "../review/review.model";
-
 type CreateBookData = {
   title: string;
   author: string;
@@ -107,9 +105,6 @@ const getSingleBook = async (bookId: string) => {
 };
 
 const updateBook = async (bookId: string, data: UpdateBookData) => {
-  if (Object.keys(data).length === 0) {
-    throw new BadRequestError("Please provide fields to update");
-  }
 
   const book = await Book.findById(bookId);
 

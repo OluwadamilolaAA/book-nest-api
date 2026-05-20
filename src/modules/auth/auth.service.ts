@@ -38,14 +38,6 @@ type resetPasswordData = {
 const register = async (data: RegisterData) => {
   const { name, email, password } = data;
 
-  if (!name || !email || !password) {
-    throw new BadRequestError("All fields are required");
-  }
-
-  if (password.length < 6) {
-    throw new BadRequestError("Password must be at least 6 characters long");
-  }
-
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -87,10 +79,6 @@ const register = async (data: RegisterData) => {
 
 const login = async (data: LoginData) => {
   const { email, password, ip, userAgent } = data;
-
-  if (!email || !password) {
-    throw new BadRequestError("All fields are required");
-  }
 
   const user = await User.findOne({ email });
 
@@ -141,10 +129,6 @@ const login = async (data: LoginData) => {
 const verifyEmail = async (data: verifyEmailData) => {
   const { token, email } = data;
 
-  if (!token || !email) {
-    throw new BadRequestError("Invalid verification link");
-  }
-
   const user = await User.findOne({ email });
   if (!user) {
     throw new UnauthorizedError("Verification failed");
@@ -164,9 +148,6 @@ const verifyEmail = async (data: verifyEmailData) => {
 
 const forgotPassword = async (data: { email: string }) => {
   const { email } = data;
-  if (!email) {
-    throw new BadRequestError("Please provide email");
-  }
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -197,13 +178,6 @@ const forgotPassword = async (data: { email: string }) => {
 
 const resetPassword = async (data: resetPasswordData) => {
   const { token, email, password } = data;
-
-  if (!token || !email || !password) {
-    throw new BadRequestError("Please provide all fields");
-  };
-  if (password.length < 6) {
-  throw new BadRequestError("Password must be at least 6 characters long");
-}
 
   const user = await User.findOne({ email });
   if (!user) {

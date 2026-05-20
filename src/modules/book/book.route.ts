@@ -16,7 +16,7 @@ import { createBookSchema, getBooksQuerySchema, updateBookSchema } from "./book.
 router.post("/", isAuth, authorizedPermission(Role.ADMIN), validateRequest({ body: createBookSchema }), createBooks);
 router.get("/", validateRequest({ query: getBooksQuerySchema }), getAllBooks);
 router.get("/:id", validateRequest({ params: idParamSchema }), getSingleBook);
-router.patch("/update-book/:id", isAuth, authorizedPermission(Role.ADMIN), validateRequest({ params: idParamSchema, body: updateBookSchema }), updateBook);
-router.delete("/delete-book/:id", isAuth, authorizedPermission(Role.ADMIN), validateRequest({ params: idParamSchema }), deleteBook)
+router.patch("/:id", isAuth, authorizedPermission(Role.ADMIN), validateRequest({ params: idParamSchema, body: updateBookSchema }), updateBook);
+router.delete("/:id", isAuth, authorizedPermission(Role.ADMIN), validateRequest({ params: idParamSchema }), deleteBook)
 
 export default router;

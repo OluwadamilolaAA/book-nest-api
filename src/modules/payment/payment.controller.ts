@@ -30,4 +30,12 @@ const verifyPayment = asyncWrapper(async (req: Request, res: Response) => {
     res.status(200).json({ msg: "Payment verified successfully", payment });
 });
 
-export { initializePayment, verifyPayment };
+const paystackWebhook = asyncWrapper(async (req: Request, res: Response) => {
+  const signature = req.headers["x-paystack-signature"] as string;
+
+  await paymentService.handleWebhook(signature, req.body as Buffer);
+
+  res.sendStatus(200);
+});
+
+export { initializePayment, verifyPayment, paystackWebhook };
