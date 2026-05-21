@@ -13,6 +13,7 @@ import {
   reviewRoutes,
   userRoutes,
   paymentRoutes,
+  uploadRoutes,
 } from "./modules";
 
 import { errorHandler } from "./common/middlewares";
@@ -33,6 +34,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use(errorHandler);
 
