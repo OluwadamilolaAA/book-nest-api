@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import passport from "./config/passport";
 
 import {
   authRoutes,
@@ -25,6 +26,7 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(helmet());
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(passport.initialize());   
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

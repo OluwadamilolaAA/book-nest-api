@@ -8,7 +8,7 @@ export enum Role {
 export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: Role;
   isEmailVerified: boolean;
   verificationToken: string;
@@ -17,6 +17,10 @@ export interface IUser extends Document {
   passwordTokenExpirationDate?: Date;
   createdAt: Date;
   updatedAt: Date;
+  provider: "local" | "google" | "facebook" | "github";
+  googleId?: string;
+  facebookId?: string;
+  githubId?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -33,7 +37,9 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: function (this: IUser): boolean {
+        return this.provider === "local";
+      },
       minlength: 6,
     },
     role: {
@@ -46,7 +52,7 @@ const UserSchema = new Schema<IUser>(
       default: false,
     },
     verified: {
-      type: Date
+      type: Date,
     },
     verificationToken: {
       type: String,
@@ -56,6 +62,22 @@ const UserSchema = new Schema<IUser>(
     },
     passwordTokenExpirationDate: {
       type: Date,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google", "facebook", "github"],
+      default: "local",
+    },
+
+    googleId: {
+      type: String,
+    },
+
+    facebookId: {
+      type: String,
+    },
+    githubId: {
+      type: String,
     },
   },
   { timestamps: true, versionKey: false },

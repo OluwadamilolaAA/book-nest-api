@@ -7,16 +7,12 @@ import {
   TokenUser,
 } from "../../common/utils/jwt";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
-
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
+import { IUser } from "../user/user.model";
 
 const register = asyncWrapper(async (req: Request, res: Response) => {
   const result = await authService.register(req.body);
-  return res
-    .status(201)
-    .json({ msg: result.msg });
+
+  return res.status(201).json({ msg: result.msg });
 });
 
 const login = asyncWrapper(async (req: Request, res: Response) => {
@@ -28,7 +24,11 @@ const login = asyncWrapper(async (req: Request, res: Response) => {
   });
 
   attachResponseToCookies({ res, accessToken, refreshToken });
-  return res.status(200).json({ msg: "User login successfully", user });
+
+  return res.status(200).json({
+    msg: "User login successfully",
+    user,
+  });
 });
 
 const verifyEmail = asyncWrapper(async (req: Request, res: Response) => {
@@ -40,24 +40,58 @@ const verifyEmail = asyncWrapper(async (req: Request, res: Response) => {
   return res.status(200).json({ result });
 });
 
+const socialCallback = asyncWrapper(async (req: Request, res: Response) => {
+  const socialUser = req.user as IUser | undefined;
+
+  if (!socialUser) {
+    throw new UnauthorizedError("Social authentication failed");
+  }
+
+  const { accessToken, refreshToken } = await authService.socialLogin(
+    socialUser,
+    req.ip || "",
+    req.get("user-agent") || "",
+  );
+
+  attachResponseToCookies({ res, accessToken, refreshToken });
+
+  return res.redirect(`${process.env.CLIENT_URL}/auth/success`);
+});
+
 const forgotPassword = asyncWrapper(async (req: Request, res: Response) => {
   const result = await authService.forgotPassword(req.body);
-  return res.status(200).json({ result });
-});
-const resetPassword = asyncWrapper(async (req: Request, res: Response) => {
-  const result = await authService.resetPassword(req.body);
+
   return res.status(200).json({ result });
 });
 
-const logout = asyncWrapper(async (req: AuthRequest, res: Response) => {
-  if (!req.user) {
+const resetPassword = asyncWrapper(async (req: Request, res: Response) => {
+  const result = await authService.resetPassword(req.body);
+
+  return res.status(200).json({ result });
+});
+
+const logout = asyncWrapper(async (req: Request, res: Response) => {
+  const user = req.user as TokenUser | undefined;
+
+  if (!user) {
     throw new UnauthorizedError("Invalid authorization");
   }
-  await authService.logout(req.user.userId);
+
+  await authService.logout(user.userId);
 
   clearCookies(res);
 
-  return res.status(200).json({ msg: "User logged out successfully" });
+  return res.status(200).json({
+    msg: "User logged out successfully",
+  });
 });
 
-export { register, login, verifyEmail, forgotPassword, resetPassword, logout };
+export {
+  register,
+  login,
+  verifyEmail,
+  socialCallback,
+  forgotPassword,
+  resetPassword,
+  logout,
+};

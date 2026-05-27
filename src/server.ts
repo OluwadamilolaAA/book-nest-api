@@ -5,7 +5,7 @@ import app from "./app";
 import connectDB from "./config/db";
 import mongoose from "mongoose";
 
-const PORT = process.env.PORT || 500;
+const PORT = process.env.PORT || 5000;
 
 const startServer = async (): Promise<void> => {
   try {

@@ -86,6 +86,10 @@ const login = async (data: LoginData) => {
     throw new UnauthorizedError("Invalid credentials");
   }
 
+  if (!user.password) {
+  throw new UnauthorizedError("Please login with your social account");
+}
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     throw new UnauthorizedError("Invalid credentials");
@@ -145,6 +149,39 @@ const verifyEmail = async (data: verifyEmailData) => {
   await user.save();
   return { msg: "Email verified successfully" };
 };
+
+const socialLogin = async (user: any, ip: string, userAgent: string) => {
+  const tokenUser = createTokenUser(user);
+
+  const refreshToken = crypto.randomBytes(40).toString("hex");
+  await Token.deleteMany({ user: user._id });
+
+  await Token.create({
+    refreshToken: hashString(refreshToken),
+    ip,
+    userAgent,
+    user: user._id,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+  });
+
+  const accessToken = createJwt({
+    payload: { user: tokenUser },
+    secret: process.env.ACCESS_TOKEN_SECRET as string,
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN as StringValue,
+  });
+
+  const refreshJwt = createJwt({
+    payload: { user: tokenUser, refreshToken },
+    secret: process.env.REFRESH_TOKEN_SECRET as string,
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN as StringValue,
+  });
+
+  return {
+    user: tokenUser,
+    accessToken,
+    refreshToken: refreshJwt,
+  };
+}
 
 const forgotPassword = async (data: { email: string }) => {
   const { email } = data;
@@ -214,4 +251,4 @@ const logout = async (userId: string) => {
   return { msg: "Logout successfully" };
 };
 
-export { register, login, verifyEmail, forgotPassword, resetPassword, logout };
+export { register, login, verifyEmail, socialLogin, forgotPassword, resetPassword, logout };
