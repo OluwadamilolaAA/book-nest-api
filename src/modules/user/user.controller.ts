@@ -1,12 +1,8 @@
 import { Request, Response } from "express";
 import asyncWrapper from "../../common/middlewares/async-wrapper";
 import * as userService from "./user.service";
-import { TokenUser } from "../../common/utils/jwt";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
-
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
+import { AuthenticatedRequest } from "../../common/types/auth";
 
 const getAllUsers = asyncWrapper(async (_req: Request, res: Response) => {
   const users = await userService.getAllUsers();
@@ -22,7 +18,7 @@ const getUser = asyncWrapper(async (req: Request, res: Response) => {
 });
 
 const showCurrentUser = asyncWrapper(
-  async (req: AuthRequest, res: Response) => {
+  async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
       throw new UnauthorizedError("Invalid authorization");
     }
@@ -31,7 +27,7 @@ const showCurrentUser = asyncWrapper(
   },
 );
 
-const updateUser = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const updateUser = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -39,7 +35,7 @@ const updateUser = asyncWrapper(async (req: AuthRequest, res: Response) => {
   return res.status(200).json({ user });
 });
 
-const updateUserPassword = asyncWrapper(async(req: AuthRequest, res: Response) => {
+const updateUserPassword = asyncWrapper(async(req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }

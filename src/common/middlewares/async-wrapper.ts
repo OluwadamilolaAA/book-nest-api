@@ -1,19 +1,17 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 
-const asyncWrapper = (
-  fn: (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => Promise<any>
-) => {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+type AsyncController<TRequest extends Request = Request> = (
+  req: TRequest,
+  res: Response,
+  next: NextFunction
+) => Promise<unknown>;
+
+const asyncWrapper = <TRequest extends Request = Request>(
+  fn: AsyncController<TRequest>
+): RequestHandler => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      await fn(req, res, next);
+      await fn(req as TRequest, res, next);
     } catch (err) {
       next(err);
     }

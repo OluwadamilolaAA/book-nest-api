@@ -1,14 +1,10 @@
 import * as orderService from "./order.service";
 import { Request, Response } from "express";
-import { TokenUser } from "../../common/utils/jwt";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
 import asyncWrapper from "../../common/middlewares/async-wrapper";
+import { AuthenticatedRequest } from "../../common/types/auth";
 
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
-
-const createOrder = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const createOrder = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -16,7 +12,7 @@ const createOrder = asyncWrapper(async (req: AuthRequest, res: Response) => {
   res.status(201).json({ msg: "Order created successfully", order });
 });
 
-const getMyOrders = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const getMyOrders = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -29,7 +25,7 @@ const getAllOrders = asyncWrapper(async (req: Request, res: Response) => {
   return res.status(200).json({ msg: "Orders retrieved successfully", orders });
 });
 
-const getSingleOrder = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const getSingleOrder = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -46,7 +42,7 @@ const updateOrderStatus = asyncWrapper(async (req: Request, res: Response) => {
     .json({ msg: "Order status updated successfully", order });
 });
 
-const cancelOrder = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const cancelOrder = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }

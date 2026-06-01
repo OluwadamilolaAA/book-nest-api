@@ -1,14 +1,10 @@
 import * as paymentService from "./payment.service";
 import { Request, Response } from "express";
-import { TokenUser } from "../../common/utils/jwt";
 import { asyncWrapper } from "../../common/middlewares";
 import { UnauthorizedError } from "../../common/errors";
+import { AuthenticatedRequest } from "../../common/types/auth";
 
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
-
-const initializePayment = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const initializePayment = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
         throw new UnauthorizedError("Invalid authorization");
     };

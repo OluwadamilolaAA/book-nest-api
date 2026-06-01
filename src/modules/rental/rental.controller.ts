@@ -1,22 +1,18 @@
 import * as rentalService from "./rental.service";
 import { Request, Response } from "express";
-import { TokenUser } from "../../common/utils/jwt";
 import asyncWrapper from "../../common/middlewares/async-wrapper";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
+import { AuthenticatedRequest } from "../../common/types/auth";
 
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
-
-const rentBook = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const rentBook = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
-    throw new Error("User not authenticated");
+    throw new UnauthorizedError("User not authenticated");
   }
   const rental = await rentalService.rentBook(req.user.userId, req.body);
   res.status(201).json({ msg: "Book rented successfully", rental });
 });
 
-const getMyRentals = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const getMyRentals = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -30,7 +26,7 @@ const getAllRentals = asyncWrapper(async (req: Request, res: Response) => {
 });
 
 const getSingleRental = asyncWrapper(
-  async (req: AuthRequest, res: Response) => {
+  async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
       throw new UnauthorizedError("Invalid authorization");
     }
@@ -41,7 +37,7 @@ const getSingleRental = asyncWrapper(
   },
 );
 
-const returnBook = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const returnBook = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -51,7 +47,7 @@ const returnBook = asyncWrapper(async (req: AuthRequest, res: Response) => {
   res.status(200).json({ msg: "Book returned successfully", rental });
 });
 
-const cancelRental = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const cancelRental = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }

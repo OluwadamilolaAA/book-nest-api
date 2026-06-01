@@ -1,14 +1,10 @@
 import * as bookService from "./book.service";
 import asyncWrapper from "../../common/middlewares/async-wrapper";
 import { Request, Response } from "express";
-import { TokenUser } from "../../common/utils/jwt";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
+import { AuthenticatedRequest } from "../../common/types/auth";
 
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
-
-const createBooks = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const createBooks = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }

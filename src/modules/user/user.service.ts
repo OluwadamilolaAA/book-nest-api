@@ -59,7 +59,7 @@ const updateUser = async (userId: string, data: updateUserData) => {
     user.name = name;
   }
   await user.save();
-  return { user: createTokenUser };
+  return { user: createTokenUser(user) };
 };
 
 const updateUserPassword = async (
@@ -79,6 +79,10 @@ const updateUserPassword = async (
   const user = await User.findById(userId);
   if (!user) {
     throw new BadRequestError("User not found");
+  }
+
+  if (!user.password) {
+    throw new UnauthorizedError("Old password is incorrect");
   }
 
   const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);

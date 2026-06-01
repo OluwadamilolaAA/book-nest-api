@@ -16,7 +16,7 @@ const isAuth = (req: Request, _res: Response, next: NextFunction) => {
       secret: process.env.ACCESS_TOKEN_SECRET as string,
     }) as { payload: { user: TokenUser } };
 
-    req.user = decoded.payload.user as any;
+    req.user = decoded.payload.user;
 
     next();
   } catch (err) {

@@ -1,14 +1,10 @@
 import * as reviewService from "./review.service";
 import asyncWrapper from "../../common/middlewares/async-wrapper";
-import { TokenUser } from "../../common/utils/jwt";
 import { Response, Request } from "express";
 import UnauthorizedError from "../../common/errors/unauthorized-error";
+import { AuthenticatedRequest } from "../../common/types/auth";
 
-interface AuthRequest extends Request {
-  user?: TokenUser;
-}
-
-const createReviews = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const createReviews = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -44,7 +40,7 @@ const getSingleReview = asyncWrapper(async (req: Request, res: Response) => {
   return res.status(200).json({ review });
 });
 
-const updateReview = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const updateReview = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
@@ -59,7 +55,7 @@ const updateReview = asyncWrapper(async (req: AuthRequest, res: Response) => {
   });
 });
 
-const deleteReview = asyncWrapper(async (req: AuthRequest, res: Response) => {
+const deleteReview = asyncWrapper(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     throw new UnauthorizedError("Invalid authorization");
   }
