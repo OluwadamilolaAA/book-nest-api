@@ -17,9 +17,8 @@ export interface IUser extends Document {
   passwordTokenExpirationDate?: Date;
   createdAt: Date;
   updatedAt: Date;
-  provider: "local" | "google" | "facebook" | "github";
+  provider: "local" | "google" | "github";
   googleId?: string;
-  facebookId?: string;
   githubId?: string;
 }
 
@@ -65,15 +64,11 @@ const UserSchema = new Schema<IUser>(
     },
     provider: {
       type: String,
-      enum: ["local", "google", "facebook", "github"],
+      enum: ["local", "google", "github"],
       default: "local",
     },
 
     googleId: {
-      type: String,
-    },
-
-    facebookId: {
       type: String,
     },
     githubId: {

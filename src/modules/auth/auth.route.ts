@@ -81,22 +81,6 @@ router.get(
   socialCallback,
 );
 
-router.get(
-  "/facebook",
-  passport.authenticate("facebook", {
-    scope: ["email"],
-    session: false,
-  }),
-);
-
-router.get(
-  "/facebook/callback",
-  passport.authenticate("facebook", {
-    session: false,
-    failureRedirect: `${process.env.CLIENT_URL}/login`,
-  }),
-  socialCallback,
-);
 
 router.get(
   "/github",

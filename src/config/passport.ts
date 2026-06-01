@@ -1,6 +1,5 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import User, { Role } from "../modules/user/user.model";
 
@@ -52,50 +51,6 @@ passport.use(
 ),
 );
 
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FACEBOOK_APP_ID as string,
-      clientSecret: process.env.FACEBOOK_APP_SECRET as string,
-      callbackURL: process.env.FACEBOOK_CALLBACK_URL as string,
-      profileFields: ["id", "displayName", "emails"],
-    },
-    async (_accessToken, _refreshToken, profile, done) => {
-      try {
-        const email = profile.emails?.[0]?.value;
-        const name = profile.displayName || "Facebook User";
-
-        if (!email) return done(null, false);
-
-        let user = await User.findOne({ email });
-
-        if (!user) {
-          user = await User.create({
-            name,
-            email,
-            provider: "facebook",
-            facebookId: profile.id,
-            role: await getRole(),
-            isEmailVerified: true,
-            verified: new Date(),
-          });
-        }
-
-        if (!user.facebookId) {
-          user.facebookId = profile.id;
-          user.provider = "facebook";
-          user.isEmailVerified = true;
-          user.verified = new Date();
-          await user.save();
-        }
-
-        done(null, user);
-      } catch (error) {
-        done(error as Error);
-      }
-    },
-  ),
-);
 
 passport.use(
   new GitHubStrategy(
